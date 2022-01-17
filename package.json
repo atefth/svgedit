@@ -1,7 +1,7 @@
 {
-  "name": "svgedit",
-  "version": "7.1.1",
-  "description": "Powerful SVG-Editor for your browser ",
+  "name": "@aize/svgedit",
+  "version": "0.0.0",
+  "description": "SVG-Editor wrapper for ME",
   "main": "dist/Editor.js",
   "module": "dist/Editor.js",
   "directories": {
@@ -39,7 +39,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SVG-Edit/svgedit.git"
+    "url": "git+https://github.com/atefth/svgedit.git"
   },
   "keywords": [
     "svg-editor",
