@@ -1,5 +1,5 @@
 {
-  "name": "@aize/svgedit",
+  "name": "atefth/svgedit",
   "version": "0.0.0",
   "description": "SVG-Editor wrapper for ME",
   "main": "dist/Editor.js",
