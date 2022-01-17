@@ -50,7 +50,7 @@ export const init = (canvas) => {
 * @function module:svgcanvas.SvgCanvas#svgCanvasToString
 * @returns {string} The SVG image for output
 */
-export const svgCanvasToString = () => {
+export let svgCanvasToString = () => {
   // keep calling it until there are none to remove
   while (svgCanvas.removeUnusedDefElems() > 0) { } // eslint-disable-line no-empty
 
@@ -108,7 +108,7 @@ export const svgCanvasToString = () => {
 * @param {Integer} indent - Number of spaces to indent this tag
 * @returns {string} The given element as an SVG tag
 */
-export const svgToString = function (elem, indent) {
+export let svgToString = function (elem, indent) {
   const curConfig = svgCanvas.getCurConfig()
   const nsMap = svgCanvas.getNsMap()
   const out = []
@@ -297,7 +297,7 @@ export const svgToString = function (elem, indent) {
 * @returns {boolean} This function returns `false` if the set was
 *     unsuccessful, `true` otherwise.
 */
-export const setSvgString = function (xmlString, preventUndo) {
+export let setSvgString = function (xmlString, preventUndo) {
   const curConfig = svgCanvas.getCurConfig()
   const dataStorage = svgCanvas.getDataStorage()
   try {
@@ -515,7 +515,7 @@ export const setSvgString = function (xmlString, preventUndo) {
 * arbitrary transform lists, but makes some assumptions about how the transform list
 * was obtained
 */
-export const importSvgString = function (xmlString) {
+export let importSvgString = function (xmlString) {
   const dataStorage = svgCanvas.getDataStorage()
   let j; let ts; let useEl
   try {
@@ -642,7 +642,7 @@ export const importSvgString = function (xmlString) {
 * @param {string} src - The path/URL of the image
 * @returns {Promise<string|false>} Resolves to a Data URL (string|false)
 */
-export const embedImage = function (src) {
+export let embedImage = function (src) {
   // Todo: Remove this Promise in favor of making an async/await `Image.load` utility
   return new Promise(function (resolve, reject) {
     // load in the image and once it's loaded, get the dimensions
@@ -739,7 +739,7 @@ function getIssues () {
 * @todo Confirm/fix ICO type
 * @returns {Promise<module:svgcanvas.ImageExportedResults>} Resolves to {@link module:svgcanvas.ImageExportedResults}
 */
-export const rasterExport = async function (imgType, quality, exportWindowName, opts = {}) {
+export let rasterExport = async function (imgType, quality, exportWindowName, opts = {}) {
   const type = imgType === 'ICO' ? 'BMP' : (imgType || 'PNG')
   const mimeType = 'image/' + type.toLowerCase()
   const { issues, issueCodes } = getIssues()
@@ -827,7 +827,7 @@ export const rasterExport = async function (imgType, quality, exportWindowName, 
 * @fires module:svgcanvas.SvgCanvas#event:exportedPDF
 * @returns {Promise<module:svgcanvas.PDFExportedResults>} Resolves to {@link module:svgcanvas.PDFExportedResults}
 */
-export const exportPDF = async (
+export let exportPDF = async (
   exportWindowName,
   outputType = isChrome() ? 'save' : undefined
 ) => {

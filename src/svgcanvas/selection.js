@@ -338,7 +338,7 @@ export const getIntersectionListMethod = (rect) => {
  * @param {Element} elem - SVG element to wrap
  * @returns {void}
  */
-export const groupSvgElem = (elem) => {
+export let groupSvgElem = (elem) => {
   const dataStorage = svgCanvas.getDataStorage()
   const g = document.createElementNS(NS.SVG, 'g')
   elem.replaceWith(g)
@@ -353,7 +353,7 @@ export const groupSvgElem = (elem) => {
  * @param {XMLDocument} newDoc - The SVG DOM document
  * @returns {void}
  */
-export const prepareSvg = (newDoc) => {
+export let prepareSvg = (newDoc) => {
   svgCanvas.sanitizeSvg(newDoc.documentElement)
 
   // convert paths into absolute commands
@@ -374,7 +374,7 @@ export const prepareSvg = (newDoc) => {
  * @fires module:svgcanvas.SvgCanvas#event:changed
  * @returns {void}
  */
-export const setRotationAngle = (val, preventUndo) => {
+export let setRotationAngle = (val, preventUndo) => {
   const selectedElements = svgCanvas.getSelectedElements()
   // ensure val is the proper type
   val = Number.parseFloat(val)
@@ -444,7 +444,7 @@ export const setRotationAngle = (val, preventUndo) => {
  * @fires module:svgcanvas.SvgCanvas#event:changed
  * @returns {void}
  */
-export const recalculateAllSelectedDimensions = () => {
+export let recalculateAllSelectedDimensions = () => {
   const text =
     svgCanvas.getCurrentResizeMode() === 'none' ? 'position' : 'size'
   const batchCmd = new BatchCommand(text)
