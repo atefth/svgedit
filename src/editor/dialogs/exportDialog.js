@@ -1,4 +1,3 @@
-/* globals svgEditor */
 import './se-elix/define/NumberSpinBox.js'
 
 import exportDialogHTML from './exportDialog.html'
@@ -107,7 +106,7 @@ export class SeExportDialog extends HTMLElement {
       e.preventDefault()
       this.value = e.target.value
     })
-    svgEditor.$click(this.$input, (e) => {
+    this.$input.addEventListener('click', (e) => {
       e.preventDefault()
       this.value = e.target.value
     })
@@ -133,8 +132,8 @@ export class SeExportDialog extends HTMLElement {
         this.$qualityCont.style.display = 'block'
       }
     }
-    svgEditor.$click(this.$okBtn, (evt) => onSubmitHandler(evt, 'ok'))
-    svgEditor.$click(this.$cancelBtn, (evt) => onSubmitHandler(evt, 'cancel'))
+    this.$okBtn.addEventListener('click', (evt) => onSubmitHandler(evt, 'ok'))
+    this.$cancelBtn.addEventListener('click', (evt) => onSubmitHandler(evt, 'cancel'))
     this.$exportOption.addEventListener('change', (evt) => onChangeHandler(evt))
   }
 }

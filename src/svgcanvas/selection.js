@@ -208,28 +208,25 @@ export const getMouseTargetMethod = (evt) => {
  * @param {"mouseDown"|"mouseMove"|"mouseUp"|"zoomChanged"|"IDsUpdated"|"canvasUpdated"|"toolButtonStateUpdate"|"selectedChanged"|"elementTransition"|"elementChanged"|"langReady"|"langChanged"|"addLangData"|"onNewDocument"|"workareaResized"} action
  * @param {module:svgcanvas.SvgCanvas#event:ext_mouseDown|module:svgcanvas.SvgCanvas#event:ext_mouseMove|module:svgcanvas.SvgCanvas#event:ext_mouseUp|module:svgcanvas.SvgCanvas#event:ext_zoomChanged|module:svgcanvas.SvgCanvas#event:ext_IDsUpdated|module:svgcanvas.SvgCanvas#event:ext_canvasUpdated|module:svgcanvas.SvgCanvas#event:ext_toolButtonStateUpdate|module:svgcanvas.SvgCanvas#event:ext_selectedChanged|module:svgcanvas.SvgCanvas#event:ext_elementTransition|module:svgcanvas.SvgCanvas#event:ext_elementChanged|module:svgcanvas.SvgCanvas#event:ext_langReady|module:svgcanvas.SvgCanvas#event:ext_langChanged|module:svgcanvas.SvgCanvas#event:ext_addLangData|module:svgcanvas.SvgCanvas#event:ext_onNewDocument|module:svgcanvas.SvgCanvas#event:ext_workareaResized|module:svgcanvas.ExtensionVarBuilder} [vars]
  * @param {boolean} [returnArray]
+ * @param {module:svgcanvas.ExtensionNameFilter} nameFilter
  * @returns {GenericArray<module:svgcanvas.ExtensionStatus>|module:svgcanvas.ExtensionStatus|false} See {@tutorial ExtensionDocs} on the ExtensionStatus.
  */
 /* eslint-enable max-len */
 export const runExtensionsMethod = (
   action,
   vars,
-  returnArray
+  returnArray,
+  nameFilter
 ) => {
   let result = returnArray ? [] : false
   for (const [name, ext] of Object.entries(svgCanvas.getExtensions())) {
-    if (typeof vars === 'function') {
-      vars = vars(name) // ext, action
+    if (nameFilter && !nameFilter(name)) {
+      return
     }
-    if (ext.eventBased) {
-      const event = new CustomEvent('svgedit', {
-        detail: {
-          action,
-          vars
-        }
-      })
-      document.dispatchEvent(event)
-    } else if (ext[action]) {
+    if (ext && action in ext) {
+      if (typeof vars === 'function') {
+        vars = vars(name) // ext, action
+      }
       if (returnArray) {
         result.push(ext[action](vars))
       } else {
@@ -338,7 +335,7 @@ export const getIntersectionListMethod = (rect) => {
  * @param {Element} elem - SVG element to wrap
  * @returns {void}
  */
-export let groupSvgElem = (elem) => {
+export const groupSvgElem = (elem) => {
   const dataStorage = svgCanvas.getDataStorage()
   const g = document.createElementNS(NS.SVG, 'g')
   elem.replaceWith(g)
@@ -353,7 +350,7 @@ export let groupSvgElem = (elem) => {
  * @param {XMLDocument} newDoc - The SVG DOM document
  * @returns {void}
  */
-export let prepareSvg = (newDoc) => {
+export const prepareSvg = (newDoc) => {
   svgCanvas.sanitizeSvg(newDoc.documentElement)
 
   // convert paths into absolute commands
@@ -374,7 +371,7 @@ export let prepareSvg = (newDoc) => {
  * @fires module:svgcanvas.SvgCanvas#event:changed
  * @returns {void}
  */
-export let setRotationAngle = (val, preventUndo) => {
+export const setRotationAngle = (val, preventUndo) => {
   const selectedElements = svgCanvas.getSelectedElements()
   // ensure val is the proper type
   val = Number.parseFloat(val)
@@ -444,7 +441,7 @@ export let setRotationAngle = (val, preventUndo) => {
  * @fires module:svgcanvas.SvgCanvas#event:changed
  * @returns {void}
  */
-export let recalculateAllSelectedDimensions = () => {
+export const recalculateAllSelectedDimensions = () => {
   const text =
     svgCanvas.getCurrentResizeMode() === 'none' ? 'position' : 'size'
   const batchCmd = new BatchCommand(text)

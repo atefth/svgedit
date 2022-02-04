@@ -22,7 +22,7 @@ export const init = (canvas) => {
 * @param {Float} val - The new `stdDeviation` value
 * @returns {void}
 */
-export let setBlurNoUndo = function (val) {
+export const setBlurNoUndo = function (val) {
   const selectedElements = svgCanvas.getSelectedElements()
   if (!svgCanvas.getFilter()) {
     svgCanvas.setBlur(val)
@@ -64,7 +64,7 @@ function finishChange () {
 * @param {Float} stdDev - The standard deviation value on which to base the offset size
 * @returns {void}
 */
-export let setBlurOffsets = function (filterElem, stdDev) {
+export const setBlurOffsets = function (filterElem, stdDev) {
   if (stdDev > 3) {
     // TODO: Create algorithm here where size is based on expected blur
     svgCanvas.assignAttributes(filterElem, {
@@ -88,7 +88,7 @@ export let setBlurOffsets = function (filterElem, stdDev) {
 * @param {boolean} complete - Whether or not the action should be completed (to add to the undo manager)
 * @returns {void}
 */
-export let setBlur = function (val, complete) {
+export const setBlur = function (val, complete) {
   const {
     InsertElementCommand, ChangeElementCommand, BatchCommand
   } = svgCanvas.history

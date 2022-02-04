@@ -8,7 +8,7 @@ import { jGraduate } from '../editor/components/jgraduate/jQuery.jGraduate.js'
 import { NS } from './namespaces.js'
 import {
   getVisibleElements, getStrokedBBoxDefaultVisible, findDefs,
-  walkTree, getHref, setHref, getElement
+  walkTree, isNullish, getHref, setHref, getElement
 } from './utilities.js'
 import {
   convertToNum
@@ -30,7 +30,7 @@ export const init = (canvas) => {
 * @function module:elem-get-set.SvgCanvas#getResolution
 * @returns {DimensionsAndZoom} The current dimensions and zoom level in an object
 */
-export const getResolutionMethod = () => {
+export const getResolutionMethod = function () {
   const zoom = svgCanvas.getZoom()
   const w = svgCanvas.getSvgContent().getAttribute('width') / zoom
   const h = svgCanvas.getSvgContent().getAttribute('height') / zoom
@@ -48,7 +48,7 @@ export const getResolutionMethod = () => {
 * @returns {string|void} the current group/SVG's title contents or
 * `undefined` if no element is passed nd there are no selected elements.
 */
-export const getTitleMethod = (elem) => {
+export const getTitleMethod = function (elem) {
   const selectedElements = svgCanvas.getSelectedElements()
   const dataStorage = svgCanvas.getDataStorage()
   elem = elem || selectedElements[0]
@@ -74,7 +74,7 @@ export const getTitleMethod = (elem) => {
 * @todo Combine this with `setDocumentTitle`
 * @returns {void}
 */
-export const setGroupTitleMethod = (val) => {
+export const setGroupTitleMethod = function (val) {
   const {
     InsertElementCommand, RemoveElementCommand,
     ChangeElementCommand, BatchCommand
@@ -91,7 +91,7 @@ export const setGroupTitleMethod = (val) => {
   const batchCmd = new BatchCommand('Set Label')
 
   let title
-  if (val.length === 0) {
+  if (!val.length) {
     // Remove title element
     const tsNextSibling = ts.nextSibling
     batchCmd.addSubCommand(new RemoveElementCommand(ts[0], tsNextSibling, elem))
@@ -119,7 +119,7 @@ export const setGroupTitleMethod = (val) => {
 * @param {string} newTitle - String with the new title
 * @returns {void}
 */
-export const setDocumentTitleMethod = (newTitle) => {
+export const setDocumentTitleMethod = function (newTitle) {
   const { ChangeElementCommand, BatchCommand } = svgCanvas.history
   const childs = svgCanvas.getSvgContent().childNodes
   let docTitle = false; let oldTitle = ''
@@ -159,7 +159,7 @@ export const setDocumentTitleMethod = (newTitle) => {
 * @returns {boolean} Indicates if resolution change was successful.
 * It will fail on "fit to content" option with no content to fit to.
 */
-export const setResolutionMethod = (x, y) => {
+export const setResolutionMethod = function (x, y) {
   const { ChangeElementCommand, BatchCommand } = svgCanvas.history
   const zoom = svgCanvas.getZoom()
   const res = svgCanvas.getResolution()
@@ -175,7 +175,7 @@ export const setResolutionMethod = (x, y) => {
       const visEls = getVisibleElements()
       svgCanvas.addToSelection(visEls)
       const dx = []; const dy = []
-      visEls.forEach((_item, _i) => {
+      visEls.forEach(function (_item, _i) {
         dx.push(bbox.x * -1)
         dy.push(bbox.y * -1)
       })
@@ -201,8 +201,8 @@ export const setResolutionMethod = (x, y) => {
     svgCanvas.getSvgContent().setAttribute('width', x)
     svgCanvas.getSvgContent().setAttribute('height', y)
 
-    svgCanvas.contentW = x
-    svgCanvas.contentH = y
+    this.contentW = x
+    this.contentH = y
     batchCmd.addSubCommand(new ChangeElementCommand(svgCanvas.getSvgContent(), { width: w, height: h }))
 
     svgCanvas.getSvgContent().setAttribute('viewBox', [0, 0, x / zoom, y / zoom].join(' '))
@@ -220,7 +220,7 @@ export const setResolutionMethod = (x, y) => {
 * @param {boolean} [add] - Indicates whether or not to add the namespace value
 * @returns {string} The editor's namespace URL
 */
-export const getEditorNSMethod = (add) => {
+export const getEditorNSMethod = function (add) {
   if (add) {
     svgCanvas.getSvgContent().setAttribute('xmlns:se', NS.SE)
   }
@@ -240,12 +240,12 @@ export const getEditorNSMethod = (add) => {
 * @param {Integer} editorH - The editor's workarea box's height
 * @returns {module:elem-get-set.ZoomAndBBox|void}
 */
-export const setBBoxZoomMethod = (val, editorW, editorH) => {
+export const setBBoxZoomMethod = function (val, editorW, editorH) {
   const zoom = svgCanvas.getZoom()
   const selectedElements = svgCanvas.getSelectedElements()
   let spacer = 0.85
   let bb
-  const calcZoom = (bb) => {
+  const calcZoom = function (bb) {
     if (!bb) { return false }
     const wZoom = Math.round((editorW / bb.width) * 100 * spacer) / 100
     const hZoom = Math.round((editorH / bb.height) * 100 * spacer) / 100
@@ -267,7 +267,7 @@ export const setBBoxZoomMethod = (val, editorW, editorH) => {
   switch (val) {
     case 'selection': {
       if (!selectedElements[0]) { return undefined }
-      const selectedElems = selectedElements.map((n, _) => {
+      const selectedElems = selectedElements.map(function (n, _) {
         if (n) {
           return n
         }
@@ -299,12 +299,12 @@ export const setBBoxZoomMethod = (val, editorW, editorH) => {
 * @fires module:elem-get-set.SvgCanvas#event:ext_zoomChanged
 * @returns {void}
 */
-export const setZoomMethod = (zoomLevel) => {
+export const setZoomMethod = function (zoomLevel) {
   const selectedElements = svgCanvas.getSelectedElements()
   const res = svgCanvas.getResolution()
   svgCanvas.getSvgContent().setAttribute('viewBox', '0 0 ' + res.w / zoomLevel + ' ' + res.h / zoomLevel)
   svgCanvas.setZoom(zoomLevel)
-  selectedElements.forEach((elem) => {
+  selectedElements.forEach(function (elem) {
     if (!elem) { return }
     svgCanvas.selectorManager.requestSelector(elem).resize()
   })
@@ -321,7 +321,7 @@ export const setZoomMethod = (zoomLevel) => {
 * @fires module:elem-get-set.SvgCanvas#event:changed
 * @returns {void}
 */
-export const setColorMethod = (type, val, preventUndo) => {
+export const setColorMethod = function (type, val, preventUndo) {
   const selectedElements = svgCanvas.getSelectedElements()
   svgCanvas.setCurShape(type, val)
   svgCanvas.setCurProperties(type + '_paint', { type: 'solidColor' })
@@ -331,7 +331,7 @@ export const setColorMethod = (type, val, preventUndo) => {
 * @param {Element} e
 * @returns {void}
 */
-  const addNonG = (e) => {
+  function addNonG (e) {
     if (e.nodeName !== 'g') {
       elems.push(e)
     }
@@ -367,7 +367,7 @@ export const setColorMethod = (type, val, preventUndo) => {
 * @param {"fill"|"stroke"} type - String indicating "fill" or "stroke" to apply to an element
 * @returns {void}
 */
-export const setGradientMethod = (type) => {
+export const setGradientMethod = function (type) {
   if (!svgCanvas.getCurProperties(type + '_paint') ||
     svgCanvas.getCurProperties(type + '_paint').type === 'solidColor') { return }
   const canvas = svgCanvas
@@ -394,7 +394,7 @@ export const setGradientMethod = (type) => {
 * @param {SVGGradientElement} grad - The gradient DOM element to compare to others
 * @returns {SVGGradientElement} The existing gradient if found, `null` if not
 */
-export const findDuplicateGradient = (grad) => {
+export const findDuplicateGradient = function (grad) {
   const defs = findDefs()
   const existingGrads = defs.querySelectorAll('linearGradient, radialGradient')
   let i = existingGrads.length
@@ -426,7 +426,7 @@ export const findDuplicateGradient = (grad) => {
       }
 
       let diff = false
-      radAttrs.forEach((attr) => {
+      radAttrs.forEach(function (attr) {
         if (gradAttrs[attr] !== ogAttrs[attr]) { diff = true }
       })
 
@@ -468,16 +468,16 @@ export const findDuplicateGradient = (grad) => {
 * @param {module:jGraduate.jGraduatePaintOptions} paint - The jGraduate paint object to apply
 * @returns {void}
 */
-export const setPaintMethod = (type, paint) => {
+export const setPaintMethod = function (type, paint) {
   // make a copy
   const p = new jGraduate.Paint(paint)
-  svgCanvas.setPaintOpacity(type, p.alpha / 100, true)
+  this.setPaintOpacity(type, p.alpha / 100, true)
 
   // now set the current paint object
   svgCanvas.setCurProperties(type + '_paint', p)
   switch (p.type) {
     case 'solidColor':
-      svgCanvas.setColor(type, p.solidColor !== 'none' ? '#' + p.solidColor : 'none')
+      this.setColor(type, p.solidColor !== 'none' ? '#' + p.solidColor : 'none')
       break
     case 'linearGradient':
     case 'radialGradient':
@@ -494,7 +494,7 @@ export const setPaintMethod = (type, paint) => {
 * @fires module:elem-get-set.SvgCanvas#event:changed
 * @returns {void}
 */
-export const setStrokeWidthMethod = (val) => {
+export const setStrokeWidthMethod = function (val) {
   const selectedElements = svgCanvas.getSelectedElements()
   if (val === 0 && ['line', 'path'].includes(svgCanvas.getMode())) {
     svgCanvas.setStrokeWidth(1)
@@ -508,7 +508,7 @@ export const setStrokeWidthMethod = (val) => {
 * @param {Element} e
 * @returns {void}
 */
-  const addNonG = (e) => {
+  function addNonG (e) {
     if (e.nodeName !== 'g') {
       elems.push(e)
     }
@@ -538,7 +538,7 @@ export const setStrokeWidthMethod = (val) => {
 * @fires module:elem-get-set.SvgCanvas#event:changed
 * @returns {void}
 */
-export const setStrokeAttrMethod = (attr, val) => {
+export const setStrokeAttrMethod = function (attr, val) {
   const selectedElements = svgCanvas.getSelectedElements()
   svgCanvas.setCurShape(attr.replace('-', '_'), val)
   const elems = []
@@ -548,7 +548,7 @@ export const setStrokeAttrMethod = (attr, val) => {
     const elem = selectedElements[i]
     if (elem) {
       if (elem.tagName === 'g') {
-        walkTree(elem, (e) => { if (e.nodeName !== 'g') { elems.push(e) } })
+        walkTree(elem, function (e) { if (e.nodeName !== 'g') { elems.push(e) } })
       } else {
         elems.push(elem)
       }
@@ -564,12 +564,12 @@ export const setStrokeAttrMethod = (attr, val) => {
 * @function module:svgcanvas.SvgCanvas#getBold
 * @returns {boolean} Indicates whether or not element is bold
 */
-export const getBoldMethod = () => {
+export const getBoldMethod = function () {
   const selectedElements = svgCanvas.getSelectedElements()
   // should only have one element selected
   const selected = selectedElements[0]
-  if (selected?.tagName === 'text' &&
-    !selectedElements[1]) {
+  if (!isNullish(selected) && selected.tagName === 'text' &&
+    isNullish(selectedElements[1])) {
     return (selected.getAttribute('font-weight') === 'bold')
   }
   return false
@@ -581,64 +581,14 @@ export const getBoldMethod = () => {
 * @param {boolean} b - Indicates bold (`true`) or normal (`false`)
 * @returns {void}
 */
-export const setBoldMethod = (b) => {
+export const setBoldMethod = function (b) {
   const selectedElements = svgCanvas.getSelectedElements()
   const selected = selectedElements[0]
-  if (selected?.tagName === 'text' &&
-    !selectedElements[1]) {
+  if (!isNullish(selected) && selected.tagName === 'text' &&
+    isNullish(selectedElements[1])) {
     svgCanvas.changeSelectedAttribute('font-weight', b ? 'bold' : 'normal')
   }
   if (!selectedElements[0].textContent) {
-    svgCanvas.textActions.setCursor()
-  }
-}
-
-/**
- * Check whether selected element has the given text decoration value or not.
- * @returns {boolean} Indicates whether or not element has the text decoration value
- */
-export const hasTextDecorationMethod = (value) => {
-  const selectedElements = svgCanvas.getSelectedElements()
-  const selected = selectedElements[0]
-
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
-    const attribute = selected.getAttribute('text-decoration') || ''
-    return attribute.includes(value)
-  }
-
-  return false
-}
-
-/**
- * Adds the given text decoration value
- * @param value The text decoration value
- * @returns {void}
- */
-export const addTextDecorationMethod = (value) => {
-  const selectedElements = svgCanvas.getSelectedElements()
-  const selected = selectedElements[0]
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
-    const oldValue = selected.getAttribute('text-decoration') || ''
-    svgCanvas.changeSelectedAttribute('text-decoration', (oldValue + ' ' + value).trim())
-  }
-  if (selectedElements.length > 0 && !selectedElements[0].textContent) {
-    svgCanvas.textActions.setCursor()
-  }
-}
-
-/**
- * Removes the given text decoration value
- * @param value The text decoration value
- * @returns {void}
- */
-export const removeTextDecorationMethod = (value) => {
-  const selectedElements = svgCanvas.getSelectedElements()
-  const selected = selectedElements[0]
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
-    const actualValues = selected.getAttribute('text-decoration') || ''
-    svgCanvas.changeSelectedAttribute('text-decoration', actualValues.replace(value, '').trim())
-  }
-  if (selectedElements.length > 0 && !selectedElements[0].textContent) {
     svgCanvas.textActions.setCursor()
   }
 }
@@ -648,10 +598,11 @@ export const removeTextDecorationMethod = (value) => {
 * @function module:svgcanvas.SvgCanvas#getItalic
 * @returns {boolean} Indicates whether or not element is italic
 */
-export const getItalicMethod = () => {
+export const getItalicMethod = function () {
   const selectedElements = svgCanvas.getSelectedElements()
   const selected = selectedElements[0]
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
+  if (!isNullish(selected) && selected.tagName === 'text' &&
+    isNullish(selectedElements[1])) {
     return (selected.getAttribute('font-style') === 'italic')
   }
   return false
@@ -663,10 +614,11 @@ export const getItalicMethod = () => {
 * @param {boolean} i - Indicates italic (`true`) or normal (`false`)
 * @returns {void}
 */
-export const setItalicMethod = (i) => {
+export const setItalicMethod = function (i) {
   const selectedElements = svgCanvas.getSelectedElements()
   const selected = selectedElements[0]
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
+  if (!isNullish(selected) && selected.tagName === 'text' &&
+    isNullish(selectedElements[1])) {
     svgCanvas.changeSelectedAttribute('font-style', i ? 'italic' : 'normal')
   }
   if (!selectedElements[0].textContent) {
@@ -679,77 +631,14 @@ export const setItalicMethod = (i) => {
  * @param {string} value - The text anchor value (start, middle or end)
  * @returns {void}
  */
-export const setTextAnchorMethod = (value) => {
+export const setTextAnchorMethod = function (value) {
   const selectedElements = svgCanvas.getSelectedElements()
   const selected = selectedElements[0]
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
+  if (!isNullish(selected) && selected.tagName === 'text' &&
+    isNullish(selectedElements[1])) {
     svgCanvas.changeSelectedAttribute('text-anchor', value)
   }
-  if (selectedElements.length > 0 && !selectedElements[0].textContent) {
-    svgCanvas.textActions.setCursor()
-  }
-}
-
-/**
- * @function module:svgcanvas.SvgCanvas#setLetterSpacingMethod Set the new letter spacing
- * @param {string} value - The letter spacing value
- * @returns {void}
- */
-export const setLetterSpacingMethod = (value) => {
-  const selectedElements = svgCanvas.getSelectedElements()
-  const selected = selectedElements[0]
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
-    svgCanvas.changeSelectedAttribute('letter-spacing', value)
-  }
-  if (selectedElements.length > 0 && !selectedElements[0].textContent) {
-    svgCanvas.textActions.setCursor()
-  }
-}
-
-/**
- * @function module:svgcanvas.SvgCanvas#setWordSpacingMethod Set the new word spacing
- * @param {string} value - The word spacing value
- * @returns {void}
- */
-export const setWordSpacingMethod = (value) => {
-  const selectedElements = svgCanvas.getSelectedElements()
-  const selected = selectedElements[0]
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
-    svgCanvas.changeSelectedAttribute('word-spacing', value)
-  }
-  if (selectedElements.length > 0 && !selectedElements[0].textContent) {
-    svgCanvas.textActions.setCursor()
-  }
-}
-
-/**
- * @function module:svgcanvas.SvgCanvas#setTextLengthMethod Set the new text length
- * @param {string} value - The text length value
- * @returns {void}
- */
-export const setTextLengthMethod = (value) => {
-  const selectedElements = svgCanvas.getSelectedElements()
-  const selected = selectedElements[0]
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
-    svgCanvas.changeSelectedAttribute('textLength', value)
-  }
-  if (selectedElements.length > 0 && !selectedElements[0].textContent) {
-    svgCanvas.textActions.setCursor()
-  }
-}
-
-/**
- * @function module:svgcanvas.SvgCanvas#setLengthAdjustMethod Set the new length adjust
- * @param {string} value - The length adjust value
- * @returns {void}
- */
-export const setLengthAdjustMethod = (value) => {
-  const selectedElements = svgCanvas.getSelectedElements()
-  const selected = selectedElements[0]
-  if (selected?.tagName === 'text' && !selectedElements[1]) {
-    svgCanvas.changeSelectedAttribute('lengthAdjust', value)
-  }
-  if (selectedElements.length > 0 && !selectedElements[0].textContent) {
+  if (!selectedElements[0].textContent) {
     svgCanvas.textActions.setCursor()
   }
 }
@@ -758,7 +647,7 @@ export const setLengthAdjustMethod = (value) => {
 * @function module:svgcanvas.SvgCanvas#getFontFamily
 * @returns {string} The current font family
 */
-export const getFontFamilyMethod = () => {
+export const getFontFamilyMethod = function () {
   return svgCanvas.getCurText('font_family')
 }
 
@@ -768,11 +657,11 @@ export const getFontFamilyMethod = () => {
 * @param {string} val - String with the new font family
 * @returns {void}
 */
-export const setFontFamilyMethod = (val) => {
+export const setFontFamilyMethod = function (val) {
   const selectedElements = svgCanvas.getSelectedElements()
   svgCanvas.setCurText('font_family', val)
   svgCanvas.changeSelectedAttribute('font-family', val)
-  if (!selectedElements[0]?.textContent) {
+  if (selectedElements[0] && !selectedElements[0].textContent) {
     svgCanvas.textActions.setCursor()
   }
 }
@@ -783,7 +672,7 @@ export const setFontFamilyMethod = (val) => {
 * @param {string} val - String with the new font color
 * @returns {void}
 */
-export const setFontColorMethod = (val) => {
+export const setFontColorMethod = function (val) {
   svgCanvas.setCurText('fill', val)
   svgCanvas.changeSelectedAttribute('fill', val)
 }
@@ -792,7 +681,7 @@ export const setFontColorMethod = (val) => {
 * @function module:svgcanvas.SvgCanvas#getFontColor
 * @returns {string} The current font color
 */
-export const getFontColorMethod = () => {
+export const getFontColorMethod = function () {
   return svgCanvas.getCurText('fill')
 }
 
@@ -800,7 +689,7 @@ export const getFontColorMethod = () => {
 * @function module:svgcanvas.SvgCanvas#getFontSize
 * @returns {Float} The current font size
 */
-export const getFontSizeMethod = () => {
+export const getFontSizeMethod = function () {
   return svgCanvas.getCurText('font_size')
 }
 
@@ -810,11 +699,11 @@ export const getFontSizeMethod = () => {
 * @param {Float} val - Float with the new font size
 * @returns {void}
 */
-export const setFontSizeMethod = (val) => {
+export const setFontSizeMethod = function (val) {
   const selectedElements = svgCanvas.getSelectedElements()
   svgCanvas.setCurText('font_size', val)
   svgCanvas.changeSelectedAttribute('font-size', val)
-  if (!selectedElements[0]?.textContent) {
+  if (selectedElements[0] && !selectedElements[0].textContent) {
     svgCanvas.textActions.setCursor()
   }
 }
@@ -823,9 +712,10 @@ export const setFontSizeMethod = (val) => {
 * @function module:svgcanvas.SvgCanvas#getText
 * @returns {string} The current text (`textContent`) of the selected element
 */
-export const getTextMethod = () => {
+export const getTextMethod = function () {
   const selectedElements = svgCanvas.getSelectedElements()
   const selected = selectedElements[0]
+  if (isNullish(selected)) { return '' }
   return (selected) ? selected.textContent : ''
 }
 
@@ -835,7 +725,7 @@ export const getTextMethod = () => {
 * @param {string} val - String with the new text
 * @returns {void}
 */
-export const setTextContentMethod = (val) => {
+export const setTextContentMethod = function (val) {
   svgCanvas.changeSelectedAttribute('#text', val)
   svgCanvas.textActions.init(val)
   svgCanvas.textActions.setCursor()
@@ -849,7 +739,7 @@ export const setTextContentMethod = (val) => {
 * @fires module:svgcanvas.SvgCanvas#event:changed
 * @returns {void}
 */
-export const setImageURLMethod = (val) => {
+export const setImageURLMethod = function (val) {
   const { ChangeElementCommand, BatchCommand } = svgCanvas.history
   const selectedElements = svgCanvas.getSelectedElements()
   const elem = selectedElements[0]
@@ -898,7 +788,7 @@ export const setImageURLMethod = (val) => {
 * @param {string} val - String with the link URL/path
 * @returns {void}
 */
-export const setLinkURLMethod = (val) => {
+export const setLinkURLMethod = function (val) {
   const { ChangeElementCommand, BatchCommand } = svgCanvas.history
   const selectedElements = svgCanvas.getSelectedElements()
   let elem = selectedElements[0]
@@ -935,11 +825,11 @@ export const setLinkURLMethod = (val) => {
 * @fires module:svgcanvas.SvgCanvas#event:changed
 * @returns {void}
 */
-export const setRectRadiusMethod = (val) => {
+export const setRectRadiusMethod = function (val) {
   const { ChangeElementCommand } = svgCanvas.history
   const selectedElements = svgCanvas.getSelectedElements()
   const selected = selectedElements[0]
-  if (selected?.tagName === 'rect') {
+  if (!isNullish(selected) && selected.tagName === 'rect') {
     const r = Number(selected.getAttribute('rx'))
     if (r !== val) {
       selected.setAttribute('rx', val)
@@ -956,15 +846,18 @@ export const setRectRadiusMethod = (val) => {
 * @param {string} url
 * @returns {void}
 */
-export const makeHyperlinkMethod = (url) => {
+export const makeHyperlinkMethod = function (url) {
   svgCanvas.groupSelectedElements('a', url)
+
+  // TODO: If element is a single "g", convert to "a"
+  //  if (selectedElements.length > 1 && selectedElements[1]) {
 }
 
 /**
 * @function module:svgcanvas.SvgCanvas#removeHyperlink
 * @returns {void}
 */
-export const removeHyperlinkMethod = () => {
+export const removeHyperlinkMethod = function () {
   svgCanvas.ungroupSelectedElement()
 }
 
@@ -978,7 +871,7 @@ export const removeHyperlinkMethod = () => {
 * @param {Integer} newType - New segment type. See {@link https://www.w3.org/TR/SVG/paths.html#InterfaceSVGPathSeg} for list
 * @returns {void}
 */
-export const setSegTypeMethod = (newType) => {
+export const setSegTypeMethod = function (newType) {
   svgCanvas.pathActions.setSegType(newType)
 }
 
@@ -989,7 +882,7 @@ export const setSegTypeMethod = (newType) => {
 * @param {string} url - URL or path to image to use
 * @returns {void}
 */
-export const setBackgroundMethod = (color, url) => {
+export const setBackgroundMethod = function (color, url) {
   const bg = getElement('canvasBackground')
   const border = bg.querySelector('rect')
   let bgImg = getElement('background_image')

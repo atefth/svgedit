@@ -1,4 +1,3 @@
-/* globals svgEditor */
 import editorPreferencesDialog from './editorPreferencesDialog.html'
 const template = document.createElement('template')
 template.innerHTML = editorPreferencesDialog
@@ -375,13 +374,13 @@ export class SeEditPrefsDialog extends HTMLElement {
     const blocks = this.$bgBlocks.querySelectorAll('div')
     const curBg = 'cur_background'
     blocks.forEach(function (blk) {
-      svgEditor.$click(blk, function () {
+      blk.addEventListener('click', function () {
         blocks.forEach((el) => el.classList.remove(curBg))
         blk.classList.add(curBg)
       })
     })
-    svgEditor.$click(this.$saveBtn, onSaveHandler)
-    svgEditor.$click(this.$cancelBtn, onCancelHandler)
+    this.$saveBtn.addEventListener('click', onSaveHandler)
+    this.$cancelBtn.addEventListener('click', onCancelHandler)
     this.$dialog.addEventListener('close', onCancelHandler)
   }
 }

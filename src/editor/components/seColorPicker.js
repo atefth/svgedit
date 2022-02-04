@@ -794,7 +794,7 @@ export class SeColorPicker extends HTMLElement {
    */
   connectedCallback () {
     this.paintBox = new PaintBox(this.$block, this.type)
-    svgEditor.$click(this.$picker, () => {
+    this.$picker.addEventListener('click', () => {
       let { paint } = this.paintBox
       jGraduateMethod(
         this.$color_picker,

@@ -1,4 +1,5 @@
 /* globals seConfirm seAlert */
+import './touch.js'
 import { convertUnit } from '../common/units.js'
 import {
   putLocale
@@ -40,7 +41,7 @@ const readySignal = () => {
   }
 }
 
-const { $id, $qq, $click } = SvgCanvas
+const { $id, $qq } = SvgCanvas
 
 /**
  *
@@ -144,7 +145,7 @@ class EditorStartup {
 
     const aLink = $id('cur_context_panel')
 
-    $click(aLink, (evt) => {
+    aLink.addEventListener('click', (evt) => {
       const link = evt.target
       if (link.hasAttribute('data-root')) {
         this.svgCanvas.leaveContext()

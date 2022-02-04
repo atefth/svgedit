@@ -25,7 +25,7 @@ export default {
   async init () {
     const svgEditor = this
     const canv = svgEditor.svgCanvas
-    const { $id, $click } = canv
+    const { $id } = canv
     const svgroot = canv.getSvgRoot()
     let lastBBox = {}
     await loadExtensionTranslation(svgEditor)
@@ -41,11 +41,11 @@ export default {
       callback () {
         if ($id('tool_shapelib') === null) {
           const buttonTemplate = `
-          <se-explorerbutton id="tool_shapelib" title="${svgEditor.i18next.t(`${name}:buttons.0.title`)}" lib="assets/svg-editor/extensions/ext-shapes/shapelib/"
+          <se-explorerbutton id="tool_shapelib" title="${svgEditor.i18next.t(`${name}:buttons.0.title`)}" lib="/me-svgedit/extensions/ext-shapes/shapelib/"
           src="shapelib.svg"></se-explorerbutton>
           `
           canv.insertChildAtIndex($id('tools_left'), buttonTemplate, 9)
-          $click($id('tool_shapelib'), () => {
+          $id('tool_shapelib').addEventListener('click', () => {
             if (this.leftPanel.updateLeftPanel('tool_shapelib')) {
               canv.setMode(modeId)
             }

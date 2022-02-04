@@ -1,4 +1,3 @@
-/* globals svgEditor */
 /* eslint-disable max-len */
 const palette = [
   // Todo: Make into configuration item?
@@ -79,7 +78,7 @@ export class SEPalette extends HTMLElement {
         newDiv.style.backgroundColor = rgb
       }
       newDiv.dataset.rgb = rgb
-      svgEditor.$click(newDiv, (evt) => {
+      newDiv.addEventListener('click', (evt) => {
         evt.preventDefault()
         // shift key or right click for stroke
         const picker = evt.shiftKey || evt.button === 2 ? 'stroke' : 'fill'

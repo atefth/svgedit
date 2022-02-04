@@ -104,7 +104,7 @@ export const dropXMLInternalSubset = (str) => {
 * @param {string} str - The string to be converted
 * @returns {string} The converted string
 */
-export const toXml = (str) => {
+export const toXml = function (str) {
   // &apos; is ok in XML, but not HTML
   // &gt; does not normally need escaping, though it can if within a CDATA expression (and preceded by "]]")
   return str
@@ -159,7 +159,7 @@ export function decodeUTF8 (argString) {
 * @param {string} argString
 * @returns {string}
 */
-export const encodeUTF8 = (argString) => {
+export const encodeUTF8 = function (argString) {
   return unescape(encodeURIComponent(argString))
 }
 
@@ -169,7 +169,7 @@ export const encodeUTF8 = (argString) => {
  * @param {string} dataurl
  * @returns {string} object URL or empty string
  */
-export const dataURLToObjectURL = (dataurl) => {
+export const dataURLToObjectURL = function (dataurl) {
   if (typeof Uint8Array === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL) {
     return ''
   }
@@ -196,7 +196,7 @@ export const dataURLToObjectURL = (dataurl) => {
  * @param {Blob} blob A Blob object or File object
  * @returns {string} object URL or empty string
  */
-export const createObjectURL = (blob) => {
+export const createObjectURL = function (blob) {
   if (!blob || typeof URL === 'undefined' || !URL.createObjectURL) {
     return ''
   }
@@ -206,7 +206,7 @@ export const createObjectURL = (blob) => {
 /**
  * @property {string} blankPageObjectURL
  */
-export const blankPageObjectURL = (() => {
+export const blankPageObjectURL = (function () {
   if (typeof Blob === 'undefined') {
     return ''
   }
@@ -220,7 +220,7 @@ export const blankPageObjectURL = (() => {
 * @param {string} input
 * @returns {string} Decimal numeric character references
 */
-export const convertToXMLReferences = (input) => {
+export const convertToXMLReferences = function (input) {
   let output = '';
   [...input].forEach((ch) => {
     const c = ch.charCodeAt()
@@ -237,7 +237,7 @@ export const convertToXMLReferences = (input) => {
 * @throws {Error}
 * @returns {XMLDocument}
 */
-export const text2xml = (sXML) => {
+export const text2xml = function (sXML) {
   if (sXML.includes('<svg:svg')) {
     sXML = sXML.replace(/<(\/?)svg:/g, '<$1').replace('xmlns:svg', 'xmlns')
   }
@@ -269,7 +269,7 @@ export const text2xml = (sXML) => {
 * @param {SVGRect} bbox - a SVGRect
 * @returns {module:utilities.BBoxObject} An object with properties names x, y, width, height.
 */
-export const bboxToObj = ({ x, y, width, height }) => {
+export const bboxToObj = function ({ x, y, width, height }) {
   return { x, y, width, height }
 }
 
@@ -286,8 +286,8 @@ export const bboxToObj = ({ x, y, width, height }) => {
 * @param {module:utilities.TreeWalker} cbFn - Callback function to run on each element
 * @returns {void}
 */
-export const walkTree = (elem, cbFn) => {
-  if (elem?.nodeType === 1) {
+export const walkTree = function (elem, cbFn) {
+  if (elem && elem.nodeType === 1) {
     cbFn(elem)
     let i = elem.childNodes.length
     while (i--) {
@@ -304,8 +304,8 @@ export const walkTree = (elem, cbFn) => {
 * @param {module:utilities.TreeWalker} cbFn - Callback function to run on each element
 * @returns {void}
 */
-export const walkTreePost = (elem, cbFn) => {
-  if (elem?.nodeType === 1) {
+export const walkTreePost = function (elem, cbFn) {
+  if (elem && elem.nodeType === 1) {
     let i = elem.childNodes.length
     while (i--) {
       walkTree(elem.childNodes.item(i), cbFn)
@@ -760,11 +760,11 @@ export const convertToPath = (elem, attrs, svgCanvas) => {
     }
 
     const { nextSibling } = elem
-    batchCmd.addSubCommand(new svgCanvas.history.RemoveElementCommand(elem, nextSibling, elem.parentNode))
+    batchCmd.addSubCommand(new svgCanvas.history.RemoveElementCommand(elem, nextSibling, parent))
+    batchCmd.addSubCommand(new svgCanvas.history.InsertElementCommand(path))
+
     svgCanvas.clearSelection()
     elem.remove()
-
-    batchCmd.addSubCommand(new svgCanvas.history.InsertElementCommand(path))
     path.setAttribute('id', id)
     path.removeAttribute('visibility')
     svgCanvas.addToSelection([path], true)
@@ -862,7 +862,7 @@ export const getBBoxWithTransform = function (elem, addSVGElementsFromJson, path
  * @todo This is problematic with large stroke-width and, for example, a single
  * horizontal line. The calculated BBox extends way beyond left and right sides.
  */
-const getStrokeOffsetForBBox = (elem) => {
+function getStrokeOffsetForBBox (elem) {
   const sw = elem.getAttribute('stroke-width')
   return (!isNaN(sw) && elem.getAttribute('stroke') !== 'none') ? sw / 2 : 0
 }
@@ -883,11 +883,11 @@ const getStrokeOffsetForBBox = (elem) => {
 * @param {module:path.pathActions} pathActions - If a transform exists, pathActions.resetOrientation() is used. See: canvas.pathActions.
 * @returns {module:utilities.BBoxObject|module:math.TransformedBox|DOMRect} A single bounding box object
 */
-export const getStrokedBBox = (elems, addSVGElementsFromJson, pathActions) => {
+export const getStrokedBBox = function (elems, addSVGElementsFromJson, pathActions) {
   if (!elems || !elems.length) { return false }
 
   let fullBb
-  elems.forEach((elem) => {
+  elems.forEach(function (elem) {
     if (fullBb) { return }
     if (!elem.parentNode) { return }
     fullBb = getBBoxWithTransform(elem, addSVGElementsFromJson, pathActions)
@@ -912,7 +912,7 @@ export const getStrokedBBox = (elems, addSVGElementsFromJson, pathActions) => {
     maxX += offset
     maxY += offset
   } else {
-    elems.forEach((elem) => {
+    elems.forEach(function (elem) {
       const curBb = getBBoxWithTransform(elem, addSVGElementsFromJson, pathActions)
       if (curBb) {
         const offset = getStrokeOffsetForBBox(elem)
@@ -942,7 +942,7 @@ export const getStrokedBBox = (elems, addSVGElementsFromJson, pathActions) => {
 * @param {Element} parentElement - The parent DOM element to search within
 * @returns {Element[]} All "visible" elements.
 */
-export const getVisibleElements = (parentElement) => {
+export const getVisibleElements = function (parentElement) {
   if (!parentElement) {
     const svgContent = svgCanvas.getSvgContent()
     parentElement = svgContent.children[0] // Prevent layers from being included
@@ -965,7 +965,7 @@ export const getVisibleElements = (parentElement) => {
 * @param {Element[]} elems - Array with DOM elements to check
 * @returns {module:utilities.BBoxObject} A single bounding box object
 */
-export const getStrokedBBoxDefaultVisible = (elems) => {
+export const getStrokedBBoxDefaultVisible = function (elems) {
   if (!elems) { elems = getVisibleElements() }
   return getStrokedBBox(
     elems,
@@ -999,7 +999,7 @@ export const getRotationAngleFromTransformList = (tlist, toRad) => {
 * @param {boolean} [toRad=false] - When true returns the value in radians rather than degrees
 * @returns {Float} The angle in degrees or radians
 */
-export let getRotationAngle = (elem, toRad) => {
+export let getRotationAngle = function (elem, toRad) {
   const selected = elem || svgCanvas.getSelectedElements()[0]
   // find the rotation transform (if any) and set it
   const tlist = selected.transform?.baseVal
@@ -1012,7 +1012,7 @@ export let getRotationAngle = (elem, toRad) => {
 * @param {string} attrVal - The attribute value as a string
 * @returns {Element} Reference element
 */
-export const getRefElem = (attrVal) => {
+export const getRefElem = function (attrVal) {
   return getElement(getUrlFromAttr(attrVal).substr(1))
 }
 /**
@@ -1021,7 +1021,7 @@ export const getRefElem = (attrVal) => {
 * @param {any} Element
 * @returns {any} Reference element
 */
-export const getFeGaussianBlur = (ele) => {
+export const getFeGaussianBlur = function (ele) {
   if (ele?.firstChild?.tagName === 'feGaussianBlur') {
     return ele.firstChild
   } else {
@@ -1056,12 +1056,12 @@ export const getElement = (id) => {
 * @param {boolean} [unitCheck=false] - Boolean to indicate the need to use units.setUnitAttr
 * @returns {void}
 */
-export const assignAttributes = (elem, attrs, suspendLength, unitCheck) => {
+export const assignAttributes = function (elem, attrs, suspendLength, unitCheck) {
   for (const [key, value] of Object.entries(attrs)) {
     const ns = (key.substr(0, 4) === 'xml:'
       ? NS.XML
       : key.substr(0, 6) === 'xlink:' ? NS.XLINK : null)
-    if (value === undefined) {
+    if (isNullish(value)) {
       if (ns) {
         elem.removeAttributeNS(ns, key)
       } else {
@@ -1085,7 +1085,7 @@ export const assignAttributes = (elem, attrs, suspendLength, unitCheck) => {
 * @param {Element} element - DOM element to clean up
 * @returns {void}
 */
-export const cleanupElement = (element) => {
+export const cleanupElement = function (element) {
   const defaults = {
     'fill-opacity': 1,
     'stop-opacity': 1,
@@ -1119,7 +1119,7 @@ export const cleanupElement = (element) => {
 * @param {Float} value
 * @returns {Integer}
 */
-export const snapToGrid = (value) => {
+export const snapToGrid = function (value) {
   const unit = svgCanvas.getBaseUnit()
   let stepSize = svgCanvas.getSnappingStep()
   if (unit !== 'px') {
@@ -1135,8 +1135,8 @@ export const snapToGrid = (value) => {
  * @param {Element} img - The DOM element to prevent the click on
  * @returns {void}
  */
-export const preventClickDefault = (img) => {
-  $click(img, (e) => {
+export const preventClickDefault = function (img) {
+  img.addEventListener('click', function (e) {
     e.preventDefault()
   })
 }
@@ -1178,8 +1178,9 @@ export const stringToHTML = (str) => {
   return doc.body.firstChild
 }
 
-export const insertChildAtIndex = (parent, child, index = 0) => {
+export const insertChildAtIndex = function (parent, child, index) {
   const doc = stringToHTML(child)
+  if (!index) index = 0
   if (index >= parent.children.length) {
     parent.appendChild(doc)
   } else {
@@ -1191,7 +1192,3 @@ export const insertChildAtIndex = (parent, child, index = 0) => {
 export const $id = (id) => document.getElementById(id)
 export const $qq = (sel) => document.querySelector(sel)
 export const $qa = (sel) => [...document.querySelectorAll(sel)]
-export const $click = (element, handler) => {
-  element.addEventListener('click', handler)
-  element.addEventListener('touchend', handler)
-}

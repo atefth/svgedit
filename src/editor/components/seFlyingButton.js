@@ -40,7 +40,7 @@ template.innerHTML = `
   .handle {
     height: 8px;
     width: 8px;
-    background-image: url(./images/handle.svg);
+    background-image: url(/me-svgedit/images/handle.svg);
     position:absolute;
     bottom: 0px;
     right: 0px;
@@ -76,7 +76,7 @@ template.innerHTML = `
       <img class="button-icon" src="logo.svg" alt="icon">
       <div class="handle"></div>
     </div>
-   
+
   </div>
 
 `
@@ -280,8 +280,8 @@ export class FlyingButton extends HTMLElement {
       }
     }
     // capture event from slots
-    svgEditor.$click(this, onClickHandler)
-    svgEditor.$click(this.$handle, onClickHandler)
+    this.addEventListener('click', onClickHandler)
+    this.$handle.addEventListener('click', onClickHandler)
   }
 }
 

@@ -288,7 +288,7 @@ export const textActionsMethod = (function () {
     setSelection(first, last)
 
     // Set tripleclick
-    svgCanvas.$click(evt.target, selectAll)
+    evt.target.addEventListener('click', selectAll)
 
     setTimeout(function () {
       evt.target.removeEventListener('click', selectAll)
@@ -426,7 +426,7 @@ export const textActionsMethod = (function () {
         svgCanvas.call('selected', [curtext])
         svgCanvas.addToSelection([curtext], true)
       }
-      if (!curtext?.textContent.length) {
+      if (curtext && !curtext.textContent.length) {
         // No content, so delete
         svgCanvas.deleteSelectedElements()
       }

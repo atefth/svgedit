@@ -3,7 +3,7 @@ import SvgCanvas from '../svgcanvas/svgcanvas.js'
 import { convertUnit, isValidUnit } from '../common/units.js'
 import { isChrome } from '../common/browser.js'
 
-const { $id, $click } = SvgCanvas
+const { $id } = SvgCanvas
 const homePage = 'https://github.com/SVG-Edit/svgedit'
 
 /**
@@ -167,7 +167,7 @@ class MainMenu {
           </head>
           <body><h1>${loadingImage}</h1></body>
         <html>`
-        if (URL?.createObjectURL) {
+        if (typeof URL !== 'undefined' && URL.createObjectURL) {
           const blob = new Blob([popHTML], { type: 'text/html' })
           popURL = URL.createObjectURL(blob)
         } else {
@@ -283,7 +283,7 @@ class MainMenu {
     /**
      * Associate all button actions as well as non-button keyboard shortcuts.
      */
-    $click($id('tool_export'), function () {
+    $id('tool_export').addEventListener('click', function () {
       document
         .getElementById('se-export-dialog')
         .setAttribute('dialog', 'open')

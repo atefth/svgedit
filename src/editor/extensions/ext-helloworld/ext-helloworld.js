@@ -33,7 +33,7 @@ export default {
     const svgEditor = this
     await loadExtensionTranslation(svgEditor)
     const { svgCanvas } = svgEditor
-    const { $id, $click } = svgCanvas
+    const { $id } = svgCanvas
     return {
       name: svgEditor.i18next.t(`${name}:name`),
       callback () {
@@ -44,7 +44,7 @@ export default {
         <se-button id="hello_world" title="${title}" src="hello_world.svg"></se-button>
         `
         $id('tools_left').append(buttonTemplate.content.cloneNode(true))
-        $click($id('hello_world'), () => {
+        $id('hello_world').addEventListener('click', () => {
           svgCanvas.setMode('hello_world')
         })
       },

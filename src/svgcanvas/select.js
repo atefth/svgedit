@@ -6,14 +6,13 @@
  * @copyright 2010 Alexis Deveria, 2010 Jeff Schiller
  */
 
-import { isWebkit } from '../common/browser.js' // , isOpera
+import { isTouch, isWebkit } from '../common/browser.js' // , isOpera
 import { getRotationAngle, getBBox, getStrokedBBox } from './utilities.js'
 import { transformListToTransform, transformBox, transformPoint } from './math.js'
 
 let svgCanvas
 let selectorManager_ // A Singleton
-// change radius if touch screen
-const gripRadius = window.ontouchstart ? 10 : 4
+const gripRadius = isTouch() ? 10 : 4
 
 /**
 * Private class for DOM element selection boxes.
@@ -299,7 +298,7 @@ export class SelectorManager {
   initGroup () {
     const dataStorage = svgCanvas.getDataStorage()
     // remove old selector parent group if it existed
-    if (this.selectorParentGroup?.parentNode) {
+    if (this.selectorParentGroup && this.selectorParentGroup.parentNode) {
       this.selectorParentGroup.remove()
     }
 
@@ -419,7 +418,7 @@ export class SelectorManager {
       return this.selectorMap[elem.id]
     }
     for (let i = 0; i < N; ++i) {
-      if (!this.selectors[i]?.locked) {
+      if (this.selectors[i] && !this.selectors[i].locked) {
         this.selectors[i].locked = true
         this.selectors[i].reset(elem, bbox)
         this.selectorMap[elem.id] = this.selectors[i]
@@ -443,7 +442,7 @@ export class SelectorManager {
     if (!elem) { return }
     const N = this.selectors.length
     const sel = this.selectorMap[elem.id]
-    if (!sel?.locked) {
+    if (sel && !sel.locked) {
       // TODO(codedread): Ensure this exists in this module.
       console.warn('WARNING! selector was released but was already unlocked')
     }

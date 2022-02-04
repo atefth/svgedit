@@ -40,7 +40,7 @@ template.innerHTML = `
   .handle {
     height: 8px;
     width: 8px;
-    background-image: url(./images/handle.svg);
+    background-image: url(/me-svgedit/images/handle.svg);
     position:absolute;
     bottom: 0px;
     right: 0px;
@@ -280,10 +280,10 @@ export class ExplorerButton extends HTMLElement {
       }
     }
     // capture event from slots
-    svgEditor.$click(this, onClickHandler)
-    svgEditor.$click(this.$menu, onClickHandler)
-    svgEditor.$click(this.$lib, onClickHandler)
-    svgEditor.$click(this.$handle, onClickHandler)
+    this.addEventListener('click', onClickHandler)
+    this.$menu.addEventListener('click', onClickHandler)
+    this.$lib.addEventListener('click', onClickHandler)
+    this.$handle.addEventListener('click', onClickHandler)
   }
 
   /**

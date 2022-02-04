@@ -5,7 +5,7 @@ import SvgCanvas from '../../svgcanvas/svgcanvas.js'
 import { isValidUnit, getTypeMap, convertUnit } from '../../common/units.js'
 import topPanelHTML from './TopPanel.html'
 
-const { $qa, $id, $click } = SvgCanvas
+const { $qa, $id } = SvgCanvas
 
 /*
  * register actions for left panel
@@ -96,7 +96,7 @@ class TopPanel {
           break
         case 'g':
         case 'a': {
-          // Look for common styles
+        // Look for common styles
           const childs = this.selectedElement.getElementsByTagName('*')
           let gWidth = null
           for (i = 0, len = childs.length; i < len; i++) {
@@ -187,7 +187,7 @@ class TopPanel {
         ? this.editor.configObj.curConfig.baseUnit
         : null
 
-    const isNode = currentMode === 'pathedit'
+    const isNode = currentMode === 'pathedit' // elem ? (elem.id && elem.id.startsWith('pathpointgrip')) : false;
     const menuItems = document.getElementById('se-cmenu_canvas')
     this.hideTool('selected_panel')
     this.hideTool('multiselected_panel')
@@ -352,17 +352,29 @@ class TopPanel {
           this.displayTool('text_panel')
           $id('tool_italic').pressed = this.editor.svgCanvas.getItalic()
           $id('tool_bold').pressed = this.editor.svgCanvas.getBold()
-          $id('tool_text_decoration_underline').pressed = this.editor.svgCanvas.hasTextDecoration('underline')
-          $id('tool_text_decoration_linethrough').pressed = this.editor.svgCanvas.hasTextDecoration('line-through')
-          $id('tool_text_decoration_overline').pressed = this.editor.svgCanvas.hasTextDecoration('overline')
           $id('tool_font_family').setAttribute('value', elem.getAttribute('font-family'))
-          $id('tool_text_anchor').setAttribute('value', elem.getAttribute('text-anchor'))
           $id('font_size').value = elem.getAttribute('font-size')
-          $id('tool_letter_spacing').value = elem.getAttribute('letter-spacing') ?? 0
-          $id('tool_word_spacing').value = elem.getAttribute('word-spacing') ?? 0
-          $id('tool_text_length').value = elem.getAttribute('textLength') ?? 0
-          $id('tool_length_adjust').value = elem.getAttribute('lengthAdjust') ?? 0
           $id('text').value = elem.textContent
+          const textAnchorStart = $id('tool_text_anchor_start')
+          const textAnchorMiddle = $id('tool_text_anchor_middle')
+          const textAnchorEnd = $id('tool_text_anchor_end')
+          switch (elem.getAttribute('text-anchor')) {
+            case 'start':
+              textAnchorStart.pressed = true
+              textAnchorMiddle.pressed = false
+              textAnchorEnd.pressed = false
+              break
+            case 'middle':
+              textAnchorStart.pressed = false
+              textAnchorMiddle.pressed = true
+              textAnchorEnd.pressed = false
+              break
+            case 'end':
+              textAnchorStart.pressed = false
+              textAnchorMiddle.pressed = false
+              textAnchorEnd.pressed = true
+              break
+          }
           if (this.editor.svgCanvas.addedNew) {
             // Timeout needed for IE9
             setTimeout(() => {
@@ -752,57 +764,14 @@ class TopPanel {
   }
 
   /**
-   * Handles the click on the text decoration buttons
    *
-   * @param value The text decoration value
-   * @returns {boolean} false
-   */
-  clickTextDecoration (value) {
-    if (this.editor.svgCanvas.hasTextDecoration(value)) {
-      this.editor.svgCanvas.removeTextDecoration(value)
-    } else {
-      this.editor.svgCanvas.addTextDecoration(value)
-    }
-    this.updateContextPanel()
-    return false
-  }
-
-  /**
-   * Sets the text anchor value
-   *
+   * @param {string} value "start","end" or "middle"
    * @returns {false}
    */
-  clickTextAnchor (evt) {
-    this.editor.svgCanvas.setTextAnchor(evt.detail.value)
+  clickTextAnchor (value) {
+    this.editor.svgCanvas.setTextAnchor(value)
+    this.updateContextPanel()
     return false
-  }
-
-  /**
-   * @type {module}
-   */
-  changeLetterSpacing (e) {
-    this.editor.svgCanvas.setLetterSpacing(e.target.value)
-  }
-
-  /**
-   * @type {module}
-   */
-  changeWordSpacing (e) {
-    this.editor.svgCanvas.setWordSpacing(e.target.value)
-  }
-
-  /**
-   * @type {module}
-   */
-  changeTextLength (e) {
-    this.editor.svgCanvas.setTextLength(e.target.value)
-  }
-
-  /**
-   * @type {module}
-   */
-  changeLengthAdjust (evt) {
-    this.editor.svgCanvas.setLengthAdjust(evt.detail.value)
   }
 
   /**
@@ -886,49 +855,44 @@ class TopPanel {
     newSeEditorDialog.init(i18next)
     $id('tool_link_url').setAttribute('title', i18next.t('tools.set_link_url'))
     // register action to top panel buttons
-    $click($id('tool_source'), this.showSourceEditor.bind(this))
-    $click($id('tool_wireframe'), this.clickWireframe.bind(this))
-    $click($id('tool_undo'), this.clickUndo.bind(this))
-    $click($id('tool_redo'), this.clickRedo.bind(this))
-    $click($id('tool_clone'), this.clickClone.bind(this))
-    $click($id('tool_clone_multi'), this.clickClone.bind(this))
-    $click($id('tool_delete'), this.deleteSelected.bind(this))
-    $click($id('tool_delete_multi'), this.deleteSelected.bind(this))
-    $click($id('tool_move_top'), this.moveToTopSelected.bind(this))
-    $click($id('tool_move_bottom'), this.moveToBottomSelected.bind(this))
-    $click($id('tool_topath'), this.convertToPath.bind(this))
-    $click($id('tool_make_link'), this.makeHyperlink.bind(this))
-    $click($id('tool_make_link_multi'), this.makeHyperlink.bind(this))
-    $click($id('tool_reorient'), this.reorientPath.bind(this))
-    $click($id('tool_group_elements'), this.clickGroup.bind(this))
+    $id('tool_source').addEventListener('click', this.showSourceEditor.bind(this))
+    $id('tool_wireframe').addEventListener('click', this.clickWireframe.bind(this))
+    $id('tool_undo').addEventListener('click', this.clickUndo.bind(this))
+    $id('tool_redo').addEventListener('click', this.clickRedo.bind(this))
+    $id('tool_clone').addEventListener('click', this.clickClone.bind(this))
+    $id('tool_clone_multi').addEventListener('click', this.clickClone.bind(this))
+    $id('tool_delete').addEventListener('click', this.deleteSelected.bind(this))
+    $id('tool_delete_multi').addEventListener('click', this.deleteSelected.bind(this))
+    $id('tool_move_top').addEventListener('click', this.moveToTopSelected.bind(this))
+    $id('tool_move_bottom').addEventListener('click', this.moveToBottomSelected.bind(this))
+    $id('tool_topath').addEventListener('click', this.convertToPath.bind(this))
+    $id('tool_make_link').addEventListener('click', this.makeHyperlink.bind(this))
+    $id('tool_make_link_multi').addEventListener('click', this.makeHyperlink.bind(this))
+    $id('tool_reorient').addEventListener('click', this.reorientPath.bind(this))
+    $id('tool_group_elements').addEventListener('click', this.clickGroup.bind(this))
     $id('tool_position').addEventListener('change', (evt) => this.clickAlignEle.bind(this)(evt))
-    $click($id('tool_align_left'), () => this.clickAlign.bind(this)('left'))
-    $click($id('tool_align_right'), () => this.clickAlign.bind(this)('right'))
-    $click($id('tool_align_center'), () => this.clickAlign.bind(this)('center'))
-    $click($id('tool_align_top'), () => this.clickAlign.bind(this)('top'))
-    $click($id('tool_align_bottom'), () => this.clickAlign.bind(this)('bottom'))
-    $click($id('tool_align_middle'), () => this.clickAlign.bind(this)('middle'))
-    $click($id('tool_node_clone'), this.clonePathNode.bind(this))
-    $click($id('tool_node_delete'), this.deletePathNode.bind(this))
-    $click($id('tool_openclose_path'), this.opencloseSubPath.bind(this))
-    $click($id('tool_add_subpath'), this.addSubPath.bind(this))
-    $click($id('tool_node_link'), this.linkControlPoints.bind(this))
+    $id('tool_align_left').addEventListener('click', () => this.clickAlign.bind(this)('left'))
+    $id('tool_align_right').addEventListener('click', () => this.clickAlign.bind(this)('right'))
+    $id('tool_align_center').addEventListener('click', () => this.clickAlign.bind(this)('center'))
+    $id('tool_align_top').addEventListener('click', () => this.clickAlign.bind(this)('top'))
+    $id('tool_align_bottom').addEventListener('click', () => this.clickAlign.bind(this)('bottom'))
+    $id('tool_align_middle').addEventListener('click', () => this.clickAlign.bind(this)('middle'))
+    $id('tool_node_clone').addEventListener('click', this.clonePathNode.bind(this))
+    $id('tool_node_delete').addEventListener('click', this.deletePathNode.bind(this))
+    $id('tool_openclose_path').addEventListener('click', this.opencloseSubPath.bind(this))
+    $id('tool_add_subpath').addEventListener('click', this.addSubPath.bind(this))
+    $id('tool_node_link').addEventListener('click', this.linkControlPoints.bind(this))
     $id('angle').addEventListener('change', this.changeRotationAngle.bind(this))
     $id('blur').addEventListener('change', this.changeBlur.bind(this))
     $id('rect_rx').addEventListener('change', this.changeRectRadius.bind(this))
     $id('font_size').addEventListener('change', this.changeFontSize.bind(this))
-    $click($id('tool_ungroup'), this.clickGroup.bind(this))
-    $click($id('tool_bold'), this.clickBold.bind(this))
-    $click($id('tool_italic'), this.clickItalic.bind(this))
-    $click($id('tool_text_decoration_underline'), () => this.clickTextDecoration.bind(this)('underline'))
-    $click($id('tool_text_decoration_linethrough'), () => this.clickTextDecoration.bind(this)('line-through'))
-    $click($id('tool_text_decoration_overline'), () => this.clickTextDecoration.bind(this)('overline'))
-    $id('tool_text_anchor').addEventListener('change', (evt) => this.clickTextAnchor.bind(this)(evt))
-    $id('tool_letter_spacing').addEventListener('change', this.changeLetterSpacing.bind(this))
-    $id('tool_word_spacing').addEventListener('change', this.changeWordSpacing.bind(this))
-    $id('tool_text_length').addEventListener('change', this.changeTextLength.bind(this))
-    $id('tool_length_adjust').addEventListener('change', (evt) => this.changeLengthAdjust.bind(this)(evt))
-    $click($id('tool_unlink_use'), this.clickGroup.bind(this))
+    $id('tool_ungroup').addEventListener('click', this.clickGroup.bind(this))
+    $id('tool_bold').addEventListener('click', this.clickBold.bind(this))
+    $id('tool_italic').addEventListener('click', this.clickItalic.bind(this))
+    $id('tool_text_anchor_start').addEventListener('click', () => this.clickTextAnchor.bind(this)('start'))
+    $id('tool_text_anchor_middle').addEventListener('click', () => this.clickTextAnchor.bind(this)('middle'))
+    $id('tool_text_anchor_end').addEventListener('click', () => this.clickTextAnchor.bind(this)('end'))
+    $id('tool_unlink_use').addEventListener('click', this.clickGroup.bind(this))
     $id('image_url').addEventListener('change', (evt) => { this.setImageURL(evt.currentTarget.value) });
 
     // all top panel attributes

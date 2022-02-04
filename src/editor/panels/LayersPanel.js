@@ -1,7 +1,7 @@
 import SvgCanvas from '../../svgcanvas/svgcanvas.js'
 import LayersPanelHtml from './LayersPanel.html'
 
-const { $id, $click } = SvgCanvas
+const { $id } = SvgCanvas
 
 /**
  *
@@ -61,14 +61,14 @@ class LayersPanel {
     menuLayerBox.setAttribute('leftclick', false)
     this.editor.$container.append(menuLayerBox)
     menuLayerBox.init(i18next)
-    $click($id('layer_new'), this.newLayer.bind(this))
-    $click($id('layer_delete'), this.deleteLayer.bind(this))
-    $click($id('layer_up'), () => this.moveLayer.bind(this)(-1))
-    $click($id('layer_down'), () => this.moveLayer.bind(this)(1))
-    $click($id('layer_rename'), this.layerRename.bind(this))
+    $id('layer_new').addEventListener('click', this.newLayer.bind(this))
+    $id('layer_delete').addEventListener('click', this.deleteLayer.bind(this))
+    $id('layer_up').addEventListener('click', () => this.moveLayer.bind(this)(-1))
+    $id('layer_down').addEventListener('click', () => this.moveLayer.bind(this)(1))
+    $id('layer_rename').addEventListener('click', this.layerRename.bind(this))
     $id('se-cmenu-layers-more').addEventListener('change', this.lmenuFunc.bind(this))
     $id('se-cmenu-layers-list').addEventListener('change', (e) => { this.lmenuFunc(e) })
-    $click($id('sidepanel_handle'), () => this.toggleSidePanel())
+    $id('sidepanel_handle').addEventListener('click', () => this.toggleSidePanel())
     this.toggleSidePanel(this.editor.configObj.curConfig.showlayers)
   }
 
@@ -295,7 +295,7 @@ class LayersPanel {
     })
     const elements = $id('layerlist').querySelectorAll('td.layervis')
     Array.from(elements).forEach(function (element) {
-      $click(element, function (evt) {
+      element.addEventListener('click', function (evt) {
         const ele = evt.currentTarget.parentNode.querySelector('td.layername')
         const name = (ele) ? ele.textContent : ''
         const vis = evt.currentTarget.classList.contains('layerinvis')
