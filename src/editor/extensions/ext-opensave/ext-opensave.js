@@ -16,7 +16,6 @@
    * @returns {void}
    */
 import { fileOpen, fileSave } from 'browser-fs-access'
-import SvgCanvas from "svgedit/src/svgcanvas/svgcanvas";
 
 const name = 'opensave'
 let handle = null
