@@ -189,48 +189,27 @@ export default {
     const clickSave = async function (type, _) {
       const $editorDialog = $id('se-svg-editor-dialog')
       const editingsource = $editorDialog.getAttribute('dialog') === 'open'
-      if (editingsource) {
-        svgEditor.saveSourceEditor()
-      } else {
-        // In the future, more options can be provided here
-        const saveOpts = {
-          images: svgEditor.configObj.pref('img_save'),
-          round_digits: 6
-        }
-        // remove the selected outline before serializing
-        svgCanvas.clearSelection()
-        // Update save options if provided
-        if (saveOpts) {
-          const saveOptions = svgCanvas.mergeDeep(svgCanvas.getSvgOption(), saveOpts)
-          for (const [key, value] of Object.entries(saveOptions)) {
-            svgCanvas.setSvgOption(key, value)
-          }
-        }
-        svgCanvas.setSvgOption('apply', true)
-
-        // no need for doctype, see https://jwatt.org/svg/authoring/#doctype-declaration
-        const svg = '<?xml version="1.0"?>\n' + svgCanvas.svgCanvasToString()
-        const b64Data = svgCanvas.encode64(svg)
-        const blob = b64toBlob(b64Data, 'image/svg+xml')
-        try {
-          if (type === 'save' && handle !== null) {
-            const throwIfExistingHandleNotGood = false
-            handle = await fileSave(blob, {
-              fileName: 'icon.svg',
-              extensions: ['.svg']
-            }, handle, throwIfExistingHandleNotGood)
-          } else {
-            handle = await fileSave(blob, {
-              fileName: 'icon.svg',
-              extensions: ['.svg']
-            })
-          }
-        } catch (err) {
-          if (err.name !== 'AbortError') {
-            return console.error(err)
-          }
+      // In the future, more options can be provided here
+      const saveOpts = {
+        images: svgEditor.configObj.pref('img_save'),
+        round_digits: 6
+      }
+      // remove the selected outline before serializing
+      svgCanvas.clearSelection()
+      // Update save options if provided
+      if (saveOpts) {
+        const saveOptions = svgCanvas.mergeDeep(svgCanvas.getSvgOption(), saveOpts)
+        for (const [key, value] of Object.entries(saveOptions)) {
+          svgCanvas.setSvgOption(key, value)
         }
       }
+      svgCanvas.setSvgOption('apply', true)
+
+      // no need for doctype, see https://jwatt.org/svg/authoring/#doctype-declaration
+      const svg = '<?xml version="1.0"?>\n' + svgCanvas.svgCanvasToString()
+      const b64Data = svgCanvas.encode64(svg)
+      const blob = b64toBlob(b64Data, 'image/svg+xml')
+      return blob
     }
 
     return {
@@ -252,10 +231,11 @@ export default {
         // handler
         $id('tool_clear').addEventListener('click', clickClear.bind(this))
         $id('tool_open').addEventListener('click', clickOpen.bind(this))
-        $id('tool_save').addEventListener('click', clickSave.bind(this, 'save'))
-        $id('tool_save_as').addEventListener('click', clickSave.bind(this, 'saveas'))
+        // $id('tool_save').addEventListener('click', clickSave.bind(this, 'save'))
+        // $id('tool_save_as').addEventListener('click', clickSave.bind(this, 'saveas'))
         $id('tool_import').addEventListener('click', () => imgImport.click())
-      }
+      },
+      clickSave
     }
   }
 }
