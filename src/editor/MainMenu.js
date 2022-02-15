@@ -257,14 +257,6 @@ class MainMenu {
   }
 
   /**
-   *
-   * @returns {void}
-   */
-  openHomePage () {
-    window.open(homePage, '_blank')
-  }
-
-  /**
    * @type {module}
    */
   init () {
@@ -275,7 +267,6 @@ class MainMenu {
         <se-menu-item id="tool_export" label="tools.export_img" src="export.svg"></se-menu-item>
         <se-menu-item id="tool_docprops" label="tools.docprops" shortcut="D" src="docprop.svg"></se-menu-item>
         <se-menu-item id="tool_editor_prefs" label="config.editor_prefs" src="editPref.svg"></se-menu-item>
-        <se-menu-item id="tool_editor_homepage" label="tools.editor_homepage" src="logo.svg"></se-menu-item>
     </se-menu>`
     this.editor.$svgEditor.append(template.content.cloneNode(true))
 
@@ -299,10 +290,6 @@ class MainMenu {
     $id('tool_editor_prefs').addEventListener(
       'click',
       this.showPreferences.bind(this)
-    )
-    $id('tool_editor_homepage').addEventListener(
-      'click',
-      this.openHomePage.bind(this)
     )
     $id('se-img-prop').addEventListener(
       'change',
